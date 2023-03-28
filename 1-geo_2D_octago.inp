@@ -1,0 +1,145 @@
+! strand set  
+! created on 24/03/2023
+
+!/CLEAR
+!/PREP7
+! ================
+! ==== step 1 ====
+! ================
+! set geo parameters units: mm --> m on 24/03 after #6 meeting 
+
+!!Info from Douglas on 14/02
+!!Dimensions without insulation: 7.79 x 1.28 ..
+!!Number of strands: 20
+!!Diameter od strand: 0.7 mm
+!!Cooper non copper ratio: 0.87
+!!Insulation thickness: 155 um
+
+!! cable parameters 
+*set, t_cable, 1.4e-3      !m Cable Thickness
+*set, w_cable, 3.5e-3      !m Cable Width
+*set, ns_x, 5.             !-  Strand number in width
+*set, ns_y, 2.             !-  Strand number in thickness/height 
+*set, t_insu, 0.155e-3     !m   thickness of insulation layer
+
+!! strand parameters
+w0 =  .7e-3       !m
+t0 =  .7e-3       !m
+alpha = 0.77
+gamma = 0.25         ! measured
+e0 = 0.36e-3         ! m calculated         !
+
+! ================
+! ==== step 2 ====
+! ================
+! Define key points: index, (x,y,z) e.g.: K, 1000,   0.+xs,   0.+ys, 0. 
+
+! === define CM_epoxy === 
+! plot octagon-shaped strand (ns_x,ns_y) frame set 
+! center pt of each strand +(-) 8 distances (w0,t0,e0) 
+*do,isx,1,ns_x
+    *do, isy, 1, ns_y
+		numstr,kp,(1000*isx+100*isy)
+		! 1st octagon
+		k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, (isy-1/2)*t_cable/ns_y - t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, (isy-1/2)*t_cable/ns_y - t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + w0/2     , (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + w0/2     , (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, (isy-1/2)*t_cable/ns_y + t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, (isy-1/2)*t_cable/ns_y + t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - w0/2     , (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - w0/2     , (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+		numstr,area,100
+		a, 1000*isx+100*isy+0, 1000*isx+100*isy+1, 1000*isx+100*isy+2, 1000*isx+100*isy+3, 1000*isx+100*isy+4, 1000*isx+100*isy+5, 1000*isx+100*isy+6, 1000*isx+100*isy+7		
+
+		! 2nd octagon
+		numstr,kp,(1000*isx+100*isy+10)
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - alpha*t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*w0/2     , (isy-1/2)*t_cable/ns_y - alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*w0/2     , (isy-1/2)*t_cable/ns_y + alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*w0/2     , (isy-1/2)*t_cable/ns_y + alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*w0/2     , (isy-1/2)*t_cable/ns_y - alpha*(t0-e0)/2
+		numstr,area,200
+		a, 1000*isx+100*isy+10, 1000*isx+100*isy+11, 1000*isx+100*isy+12, 1000*isx+100*isy+13, 1000*isx+100*isy+14, 1000*isx+100*isy+15, 1000*isx+100*isy+16, 1000*isx+100*isy+17
+
+		! 3rd octagon 
+		numstr,kp,(1000*isx+100*isy+20)
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - gamma*t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*w0/2     , (isy-1/2)*t_cable/ns_y - gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*w0/2     , (isy-1/2)*t_cable/ns_y + gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*w0/2     , (isy-1/2)*t_cable/ns_y + gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*w0/2     , (isy-1/2)*t_cable/ns_y - gamma*(t0-e0)/2
+		numstr,area,300
+		a, 1000*isx+100*isy+20, 1000*isx+100*isy+21, 1000*isx+100*isy+22, 1000*isx+100*isy+23, 1000*isx+100*isy+24, 1000*isx+100*isy+25, 1000*isx+100*isy+26, 1000*isx+100*isy+27
+	*enddo 
+*enddo
+
+!!! Cut 
+*do,isx,1,ns_x
+    *do, isy, 1, ns_y
+		numstr,area,400
+		ASBA,100+(isx-1)*ns_y+isy-1,200+(isx-1)*ns_y+isy-1,,delete,keep       ! area_cu-layer = area_oct1 - area_oct2  
+		
+		numstr,area,500
+		ASBA,200+(isx-1)*ns_y+isy-1,300+(isx-1)*ns_y+isy-1,,delete,keep       ! area_nb3sn = area_oct2 - area_oct3
+	*enddo 
+*enddo
+
+! == Epoxy ==
+! area_epoxy = area_rec1 - area_all
+ALLSEL,all,area
+CM, alltmp, area
+numstr,area,600
+BLC4, 0., 0., w_cable, t_cable     ! 
+ASBA,600,alltmp,sepo,delete,keep   !ASBA,600,alltmp,,delete,keep
+CMDELE, alltmp
+
+! insulation 
+numstr,kp,10000
+k, 0, 0., t_cable
+k, 0, 0., t_cable + t_insu
+k, 0, w_cable, t_cable + t_insu
+k, 0, w_cable, t_cable
+*do,isx,ns_x, 1, -1
+	k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, t_cable
+	k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, t_cable
+*enddo 
+! 10000 - 10013
+numstr,area,700 ! insulation 
+A, 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010, 10011, 10012, 10013  !!! --> need think an easier way 
+
+*do,isy,ns_y,1,-1
+	k, 0, w_cable, (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+	k, 0, w_cable, (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+*enddo 
+k, 0, w_cable, 0.
+k, 0, w_cable, -t_insu
+k, 0, w_cable + t_insu, - t_insu
+k, 0, w_cable + t_insu, t_cable + t_insu
+A, 10002, 10003, 10014, 10015, 10016, 10017, 10018, 10019, 10020, 10021
+
+k, 0, 0., - t_insu 
+k, 0, 0., 0.
+*do,isx,1,ns_x
+	k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, 0.
+	k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, 0.
+*enddo 
+A, 10018, 10019, 10022, 10023, 10024, 10025, 10026, 10027, 10028, 10029, 10030, 10031, 10032, 10033
+
+! =================================
+! ==== step 3: define CM parts ====
+! =================================
+ASEL, s, area, , 300, 499
+CM, area_cu, area                           ! area_cu = area_cu-layer + area_cu-core
+ASEL, s, area, , 500, 599
+CM, area_nb3sn, area
+ASEL, s, area, , 600, 699
+CM, area_epoxy, area
+ASEL, s, area, , 700, 799
+CM, area_insu, area

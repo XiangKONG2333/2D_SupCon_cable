@@ -1,0 +1,284 @@
+! strand set  
+! created on 24/03/2023
+
+! ==============================
+! ==== step 9: Postprocess =====
+! ==============================
+/post1
+
+/AUTO,1  
+
+/PLOPTS,INFO,1
+/PLOPTS,LEG1,1  
+/PLOPTS,LEG2,0  
+/PLOPTS,LEG3,1  
+/PLOPTS,FRAME,0
+/PLOPTS,TITLE,1 
+/PLOPTS,MINM,1  
+/PLOPTS,FILE,0   
+/PLOPTS,WINS,1  
+/PLOPTS,WP,0
+/PLOPTS,DATE,0  
+/TRIAD,OFF  
+/REPLOT 
+/CONTOUR, 1, 10.
+
+!/CONTOUR, 1, 10., 0., ,2e-4
+
+!/POST1
+!/VIEW, 1,1,1,1
+!/REPLO 
+PLNSOL, U, Y, -0.1, 0.               ! DoF displacement in X on Nodes 
+
+set, 1, 5
+
+!!! displacement !!!
+/show,png  
+PLNSOL, U, X, 0, 1.0  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_UX,png,
+
+/show,png  
+PLNSOL, U, Y, 0, 1.0  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_UY,png,
+
+!!! strain !!!
+! total strain 
+/show,png  
+plnsol,epto, z
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_eptoz,png,
+
+/show,png  
+plnsol,epto, 1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_epto1,png,
+
+/show,png  
+plnsol,epto, eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_epto_eqv,png,
+
+! elastic strain 
+/show,png  
+!/CONTOUR, 1, 10., 0., ,.002
+PLNSOL, EPEL, eqv  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPEL_EQV,png,
+
+/show,png  
+PLNSOL, EPEL, y
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPEL_Y,png,
+
+! plastic strain 
+/show,png  
+PLNSOL, EPPL, eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_eqv,png,
+
+/show,png  
+PLNSOL, EPPL, 1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_1,png,
+
+/show,png  
+PLNSOL, EPPL, z
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_z,png,
+
+
+!!! stress !!! 
+/show,png  
+plnsol,s,y
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_sy,png,
+
+/show,png  
+plnsol,s,1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_s1,png,
+
+/show,png 
+!/CONTOUR, 1, 10., 0., ,.3E8  
+plnsol,s,eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_s_eqv,png,
+
+
+!!!!!!!!!!!!! CONTACT !!!!!!!!!!!!!!!!!!!
+!! Contact status: NearContact; Sliding 
+!! CONTSTAT
+
+!! Contact penetration: 
+!! CONTPENE 
+
+!! Contact pressure:
+!! CONTPRES 
+
+!! Contact friction stress: CONTSFRI
+
+!! Contact total stress: CONTSTOT
+
+!! Contact Sliding distance: CONTSLID
+
+!! Contact gap distance: CONTGAP
+
+!! Contact heat flux: CONTFLUX 
+
+!! Contact chattering: CONTCNOS 
+
+/show,png  
+plnsol,CONT,STAT
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSTAT_ContactStatus,png,
+
+! stress 
+/show,png  
+plnsol,CONT,PRES
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTPRES_ContactPressure,png,
+
+/show,png  
+plnsol,CONT,SFRI
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSFRI_ContactFrictionStress,png,
+
+/show,png  
+plnsol,CONT,STOT
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSTOT_ContactTotalStress,png,
+
+! sliding distance 
+/show,png  
+plnsol,CONT,SLID
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSLID_ContactSlidingDistance,png,
+
+
+
+/POST26
+cmsel,s,nset_top,node
+*GET, nb_top_layer, node, 0, count ! nb_top_layer = 733
+*VGET, node_index_top, NODE, ALL, NLIST 
+RFORCE,2,165568,F,Y, FY_2   
+
+! loop save all Fy from NSET_TOP
+NVAR
+
+
+*DO, J, 1, nb_top_layer
+    *GET, it_seqv, NODE, Fy_top(J), S, EQV
+	RFORCE,J+1,node_index_top(J),F,y, FY_%J+1%
+*ENDDO
+
+NSOL,3,165568,U,Y, UY_top
+
+*CREATE,scratch,gui 
+/OUTPUT,'Time-Uy-force-Corner','csv','../results_2023_#7' 
+*VWRITE,'UY_3','FY'  
+%C, %C  
+*VWRITE,UY_top,FY_2   
+%G, %G  
+/OUTPUT,TERM
+*END
+
+
+
+! Save time history variables to file ../results_2023_#7/Time-Uy-Corner.csv 
+*CREATE,scratch,gui 
+*DEL,_P26_EXPORT
+*DIM,_P26_EXPORT,TABLE,21,1 
+VGET,_P26_EXPORT(1,0),1 
+VGET,_P26_EXPORT(1,1),3 
+/OUTPUT,'Time-Uy-Corner','csv','../results_2023_#7' 
+*VWRITE,'TIME','UY_3'   
+%C, %C  
+*VWRITE,_P26_EXPORT(1,0),_P26_EXPORT(1,1)   
+%G, %G  
+/OUTPUT,TERM
+*END
+
+
+
+! from .log file 
+/SHOW,WIN32C
+SET,FIRST   
+/PLOPTS,INFO,3  
+/CONTOUR,ALL,18 
+/PNUM,MAT,1 
+/NUMBER,1   
+/REPLOT,RESIZE  
+PLNSOL,S,Y  
+
+
+! read nb of nset 
+cmsel,s,nset_top,node
+*GET, nb_top_layer, node, 0, count ! nb_top_layer = 733
+*VGET, NODELISTC, NODE, ALL, NLIST 
+! *VGET, ParR, Entity, ENTNUM, Item1, IT1NUM, Item2, IT2NUM, KLOOP
+! Retrieves values and stores them into an array parameter.
+
+*GET, nb_top_layer, node, 0, count ! nb_top_layer = 733
+*VGET, NODELISTC, NODE, ALL, NLIST 
+*GET, it_sy, NODE, NODELISTC(1), s, y
+*GET, it_pres, NODE, NODELISTC(1), pres
+
+*VGET, ELELISTC, NODE, ALL, ELIST 
+
+*DO, J, 1, nb_top_layer
+    *GET, it_seqv, NODE, NODELISTC(J), S, EQV
+*ENDDO
+
+!!!LIST
+PRRSOL,FY        !! Reaction Solu 
+
+cmsel,s,nset_top,node
+
+set,1,1
+PRNLD,FY, ,ALL   !! Nodal Loads
+
+!!!
+
+*cfopen,nset_top_seqv,out,,append
+*vwrite, ('    node_nb', '   sseqv')
+*DO, J, 1, nb_top_layer
+    *GET, it_seqv, NODE, NODELISTC(J), S, EQV
+	*vwrite,NODELISTC(J),it_seqv
+*ENDDO
+*cfclos,nset_top_seqv,out
+
+*cfopen,nset_top_seqv,out,,append
+*vwrite, ('node_nb', 'sseqv')
+*cfclos,nset_top_seqv,out
+
+
+!!PLESOL, F,Y, 0,1.0 ! plot reaction force in Y 
+
+
+!!! read each subset 
+_Sbstep1 = 5
+set, 1, _Sbstep1
+/title, Displacement UX at time= %_Sbstep1*0.1% s
+eplot
+PLNSOL, U, X, 0, 1.0               ! DoF displacement in X on Nodes 
+
+
+
+
+
+
+
+*DO, J, 1, 6
+    set,1,J
+	/show,png  
+	plnsol,U, y
+	/show,close 
+	/rename,March16_000,png,,Uy_%J%,png,
+*ENDDO
+
+
+
+set,1,2
+PLNSOL, U, X, 0, 1.0               ! DoF displacement in X on Nodes 

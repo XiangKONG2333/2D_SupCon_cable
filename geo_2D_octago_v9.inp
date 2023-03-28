@@ -1,0 +1,739 @@
+! strand set  
+! created on 24/03/2023
+
+/CLEAR
+/PREP7
+! ================
+! ==== step 1 ====
+! ================
+! set geo parameters units: mm --> m on 24/03 after #6 meeting 
+
+!!Info from Douglas on 14/02
+!!Dimensions without insulation: 7.79 x 1.28 ..
+!!Number of strands: 20
+!!Diameter od strand: 0.7 mm
+!!Cooper non copper ratio: 0.87
+!!Insulation thickness: 155 um
+
+!! cable parameters 
+*set, t_cable, 1.4e-3      !m Cable Thickness
+*set, w_cable, 3.5e-3      !m Cable Width
+*set, ns_x, 5.             !-  Strand number in width
+*set, ns_y, 2.             !-  Strand number in thickness/height 
+*set, t_insu, 0.155e-3     !m   thickness of insulation layer
+
+!! strand parameters
+w0 =  .7e-3       !m
+t0 =  .7e-3       !m
+alpha = 0.77
+gamma = 0.25         ! measured
+e0 = 0.36e-3         ! m calculated         !
+
+! ================
+! ==== step 2 ====
+! ================
+! Define key points: index, (x,y,z) e.g.: K, 1000,   0.+xs,   0.+ys, 0. 
+
+! === define CM_epoxy === 
+! plot octagon-shaped strand (ns_x,ns_y) frame set 
+! center pt of each strand +(-) 8 distances (w0,t0,e0) 
+*do,isx,1,ns_x
+    *do, isy, 1, ns_y
+		numstr,kp,(1000*isx+100*isy)
+		! 1st octagon
+		k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, (isy-1/2)*t_cable/ns_y - t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, (isy-1/2)*t_cable/ns_y - t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + w0/2     , (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + w0/2     , (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, (isy-1/2)*t_cable/ns_y + t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, (isy-1/2)*t_cable/ns_y + t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - w0/2     , (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - w0/2     , (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+		numstr,area,100
+		a, 1000*isx+100*isy+0, 1000*isx+100*isy+1, 1000*isx+100*isy+2, 1000*isx+100*isy+3, 1000*isx+100*isy+4, 1000*isx+100*isy+5, 1000*isx+100*isy+6, 1000*isx+100*isy+7		
+
+		! 2nd octagon
+		numstr,kp,(1000*isx+100*isy+10)
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - alpha*t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*w0/2     , (isy-1/2)*t_cable/ns_y - alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*w0/2     , (isy-1/2)*t_cable/ns_y + alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + alpha*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*w0/2     , (isy-1/2)*t_cable/ns_y + alpha*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - alpha*w0/2     , (isy-1/2)*t_cable/ns_y - alpha*(t0-e0)/2
+		numstr,area,200
+		a, 1000*isx+100*isy+10, 1000*isx+100*isy+11, 1000*isx+100*isy+12, 1000*isx+100*isy+13, 1000*isx+100*isy+14, 1000*isx+100*isy+15, 1000*isx+100*isy+16, 1000*isx+100*isy+17
+
+		! 3rd octagon 
+		numstr,kp,(1000*isx+100*isy+20)
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - gamma*t0/2 
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y - gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*w0/2     , (isy-1/2)*t_cable/ns_y - gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*w0/2     , (isy-1/2)*t_cable/ns_y + gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x + gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*(w0-e0)/2, (isy-1/2)*t_cable/ns_y + gamma*t0/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*w0/2     , (isy-1/2)*t_cable/ns_y + gamma*(t0-e0)/2
+		k, 0, (isx-1/2)*w_cable/ns_x - gamma*w0/2     , (isy-1/2)*t_cable/ns_y - gamma*(t0-e0)/2
+		numstr,area,300
+		a, 1000*isx+100*isy+20, 1000*isx+100*isy+21, 1000*isx+100*isy+22, 1000*isx+100*isy+23, 1000*isx+100*isy+24, 1000*isx+100*isy+25, 1000*isx+100*isy+26, 1000*isx+100*isy+27
+	*enddo 
+*enddo
+
+!!! Cut 
+*do,isx,1,ns_x
+    *do, isy, 1, ns_y
+		numstr,area,400
+		ASBA,100+(isx-1)*ns_y+isy-1,200+(isx-1)*ns_y+isy-1,,delete,keep       ! area_cu-layer = area_oct1 - area_oct2  
+		
+		numstr,area,500
+		ASBA,200+(isx-1)*ns_y+isy-1,300+(isx-1)*ns_y+isy-1,,delete,keep       ! area_nb3sn = area_oct2 - area_oct3
+	*enddo 
+*enddo
+
+! == Epoxy ==
+! area_epoxy = area_rec1 - area_all
+ALLSEL,all,area
+CM, alltmp, area
+numstr,area,600
+BLC4, 0., 0., w_cable, t_cable     ! 
+ASBA,600,alltmp,sepo,delete,keep   !ASBA,600,alltmp,,delete,keep
+CMDELE, alltmp
+
+! insulation 
+numstr,kp,10000
+k, 0, 0., t_cable
+k, 0, 0., t_cable + t_insu
+k, 0, w_cable, t_cable + t_insu
+k, 0, w_cable, t_cable
+*do,isx,ns_x, 1, -1
+	k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, t_cable
+	k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, t_cable
+*enddo 
+! 10000 - 10013
+numstr,area,700 ! insulation 
+A, 10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010, 10011, 10012, 10013  !!! --> need think an easier way 
+
+*do,isy,ns_y,1,-1
+	k, 0, w_cable, (isy-1/2)*t_cable/ns_y + (t0-e0)/2
+	k, 0, w_cable, (isy-1/2)*t_cable/ns_y - (t0-e0)/2
+*enddo 
+k, 0, w_cable, 0.
+k, 0, w_cable, -t_insu
+k, 0, w_cable + t_insu, - t_insu
+k, 0, w_cable + t_insu, t_cable + t_insu
+A, 10002, 10003, 10014, 10015, 10016, 10017, 10018, 10019, 10020, 10021
+
+k, 0, 0., - t_insu 
+k, 0, 0., 0.
+*do,isx,1,ns_x
+	k, 0, (isx-1/2)*w_cable/ns_x - (w0-e0)/2, 0.
+	k, 0, (isx-1/2)*w_cable/ns_x + (w0-e0)/2, 0.
+*enddo 
+A, 10018, 10019, 10022, 10023, 10024, 10025, 10026, 10027, 10028, 10029, 10030, 10031, 10032, 10033
+
+! =================================
+! ==== step 3: define CM parts ====
+! =================================
+ASEL, s, area, , 300, 499
+CM, area_cu, area                           ! area_cu = area_cu-layer + area_cu-core
+ASEL, s, area, , 500, 599
+CM, area_nb3sn, area
+ASEL, s, area, , 600, 699
+CM, area_epoxy, area
+ASEL, s, area, , 700, 799
+CM, area_insu, area
+
+! ===============================================
+! ==== step 4: Mesh and Matertial Properties ====
+! ===============================================
+!! ---> start with RT and elasticity 
+! Epoxy            =======================> MAT,1
+mp, ex, 1, 3.9E9
+mp, prxy, 1, 0.28
+TB,BISO,1,1,2,   ! BISO = BILINEAR - ISOTROPIC 
+! TB, Lab, MATID, NTEMP, NPTS, TBOPT, --, FuncName
+! Activates a data table for material properties or special element input.
+TBTEMP,0
+TBDATA,,130E6,0.2E9,,,,   !TBDATA, STLOC, C1, C2, C3, C4, C5, C6
+
+! Cu               =======================> MAT,2
+mp, ex, 2, 108E9
+mp, prxy, 2, 0.28
+TB,BISO,2,1,2,
+TBTEMP,0
+TBDATA,,46.2E6,0.37E9,,,, ! yield str, Tangent Modulus = (sigm-sigy)/(em-ey)
+
+! Nb3Sn + matrix   =======================> MAT,3
+mp, ex, 3, 140E9 ! Daly 2018
+mp, prxy, 3, 0.3
+TB, BISO, 3, 1, 2,
+TBTEMP,0
+TBDATA,,400E6,0.10E9,,,, ! yield str, Tangent Modulus = (sigm-sigy)/(em-ey)
+
+! insulation layer =======================> MAT,4 
+mp, ex, 4, 11E9
+mp, prxy, 4, 0.3
+TB, BISO, 4, 1, 2,
+TBTEMP, 0
+TBDATA,,250E6,0.06E9,,,, ! yield str, Tangent Modulus = (sigm-sigy)/(em-ey)
+
+! ==============
+! ==== Mesh ====
+! ==============
+
+!! Mesh 
+ET,1,plane183         !XK: 83, 182 (2D 4-node), 183 (2D 6/8-node) !ET, ITYPE, Ename, KOP1, KOP2, KOP3, KOP4, KOP5, KOP6, INOPR
+KEYOPT, 1, 3, 5      !KEYOPT(3) = 5     ! generalized plane strain (surface output suppressed)
+!KEYOPT, 1, 3, 2      !KEYOPT(3) = 2     ! Plane strain (Z strain = 0)
+!KEYOPT, 1, 3, 3,    !KEYOPT(3) = 3     ! Plane stress with thickness (TK) real constant input
+!!! r,1,20 !mm ! NOT WORK
+!!!!!!!!!!!! Mesh size !!!!!!!!!!!!!!!!!!!!!!
+mesh_size = 0.05e-3    ! m
+ESIZE,mesh_size ! 0.05 
+CMSEL,s,area_epoxy
+alls,below,area
+MAT,1
+AMESH,ALL
+
+CMSEL,s,area_cu
+alls,below,area
+MAT,2
+AMESH,all
+
+CMSEL,s,area_nb3sn
+alls,below,area
+MAT,3
+AMESH,all
+
+CMSEL,s,area_insu
+alls,below,area
+MAT,4
+AMESH,all
+
+! ==============================
+! ==== step 5: Node CM =========
+! ==============================
+!csys,0  !Activates a previously defined coordinate system.
+! 0 - Cartesian, 1 - Cylindrical, 2 - Spherical, 4 or WP - Working Plane
+! nset_left:  Ux = 0
+! nset_bot:   Uy = 0
+! nest_top:   Uy or Fy  
+! nset_right: Free
+
+alls
+SELTOL, 1.E-6                       !!! added on 24/03/2023
+NSEL, s, loc, y, 0.-t_insu
+CM, nset_bot, node
+NSEL, s, loc, y, t_cable + t_insu
+CM, nset_top, node
+NSEL, s, loc, x, 0.
+CM, nset_left, node
+NSEL, s, loc, x, w_cable + t_insu 
+CM, nset_right, node
+
+! ==========================
+! ==== step 6: Contacts ====
+! ==========================
+! The target surface can be defined by 
+! - CONTA172 elements (for deformable surfaces; 2-D 3-Node Surface-to-Surface Contact) or  --> (for example, PLANE182, PLANE183, INTER193, SHELL208, SHELL209, PLANE223, CPT213, MATRIX50).
+! - TARGE169 elements (for rigid bodies only; 2-D Target Segment) or 
+! - CONTA174 elements (for 3-D 8-Node Surface-to-Surface Contact)
+! - CONTA175 elements (2-D/3-D Node-to-Surface Contact)
+! Real constant ans key option for the contact elements
+! keyopt(12)=0 standard (separation - sliding)
+! keyopt(12)=1 rough (separation - no sliding)
+! keyopt(12)=2 no separation (sliding)
+! keyopt(12)=5 bonded (no separation - no sliding)
+! keyopt(9)=1 Exclude both initial penetration or gap
+! keyopt(9)=0 Include both initial penetration or gap
+! keyopt(9)=3 Include offset only (contact real constant, positive being interf), exclude both initial penetration or gap
+
+! Define contact element type: - CONTA172 & TARGE169
+!c_index = 10 
+!ET,c_index,CONTA172 ! element type 
+!KEYOPT,c_index,12,5
+!!KEYOPT,c_index,12,0 ! standard (separation - sliding) 
+!KEYOPT,c_index,9,1  
+!MP,mu,c_index,0.2
+!r,c_index
+!R,c_index,,,, ,, 
+!RMORE,,,,-0, ,
+!ET,(100+c_index),targe169
+
+ET,120,CONTA172 ! element type 
+KEYOPT,120,12,0 ! standard (separation - sliding) 
+KEYOPT,120,9,1  
+MP,mu,120,0.2
+r,120
+R,120,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+120),targe169
+
+ET,121,CONTA172 ! element type 
+KEYOPT,121,12,1 ! rough (separation - no sliding)
+KEYOPT,121,9,1  
+MP,mu,121,0.2
+r,121
+R,121,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+121),targe169
+
+ET,122,CONTA172 ! element type 
+KEYOPT,122,12,2 ! no separation (sliding)
+KEYOPT,122,9,1  
+MP,mu,122,0.2
+r,122
+R,122,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+122),targe169
+
+ET,125,CONTA172 ! element type 
+KEYOPT,125,12,5 ! bonded (no separation - no sliding)
+KEYOPT,125,9,1  
+MP,mu,125,0.2
+r,125
+R,125,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+125),targe169
+
+
+! ==============================
+! contact 1: strand - insulation 
+! ==============================
+!!!!!!!!!!!! Contact type !!!!!!!!!!!!!!!!!!!!!!
+c_contact = 125
+! === 1A insulation as TARGET ===
+CMSEL, s, area_insu!, node 
+alls, below, area
+LSEL, r, loc, y, 0., t_cable 
+LSEL, r, loc, x, 0., w_cable
+NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+type,(100+c_contact)            ! TARGE169
+ESURF,all					  ! Generates elements overlaid on the free faces of selected nodes.
+! === 1B strands as CONTA ===
+! nset_cu_right 
+CMSEL, s, area_cu  
+alls,below,area
+LSEL, r, loc, x, w_cable     
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! nset_cu_bot
+CMSEL, s, area_cu            
+alls,below,area 
+LSEL, r, loc, y, 0.
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! nset_cu_top
+CMSEL, s, area_cu 
+alls,below,area 
+LSEL, r, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+! ==============================
+! contact 2: epoxy - insulation 
+! ==============================
+! === 2A insulation as TARGET : already defined in contact 1
+!CMSEL, s, area_insu!, node 
+!alls, below, area
+!LSEL, r, loc, y, 0., t_cable 
+!LSEL, r, loc, x, 0., w_cable
+!NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+!ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+!type,(100+c_contact)            ! TARGE169
+!ESURF,all					  ! Generates elements overlaid on the free faces of selected nodes.
+! === 2B strand as CONTACT
+!! nset_epoxy_right
+CMSEL, s, area_epoxy 
+alls,below,area
+SELTOL, 1.E-6                 ! changed on 24/03/2023 from e-3 to e-6
+LSEL, r, loc, x, w_cable       
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+!! nset_epoxy_bottom 
+CMSEL, s, area_epoxy 
+alls,below,area 
+!NSEL, r, loc, y, 0.
+LSEL, r, loc, y, 0. 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+!! nset_epoxy_top
+CMSEL, s, area_epoxy, node 
+alls,below,area  
+LSEL, r, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! ==============================
+! contact 3: strand - epoxy 
+! ==============================
+! === 3A strand as TARGE
+CMSEL, s, area_cu, area
+alls,below,area 
+SELTOL, 1.E-9                 ! changed on 24/03/2023 from e-3 to e-6
+LSEL, r, loc, y, 0.1e-3, e0/4
+LSEL, a, loc, y, t0-e0/4, t0-0.1e-3
+LSEL, a, loc, y, t0+0.1e-3, t0+e0/4
+LSEL, a, loc, y, 2*t0-e0/4, 2*t0-0.1e-3
+LSEL, r, loc, x, 0.01e-3, w_cable-0.01e-3
+LPLOT
+NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+type,(100+c_contact)             ! TARGE169
+ESURF,all					     ! Generates elements overlaid on the free faces of selected nodes.
+! === 3B epoxy as CONTA
+!! nset_epoxy_right
+CMSEL, s, area_epoxy 
+alls,below,area
+SELTOL, 1e-6                     ! added on 24/03/2023
+LSEL, u, loc, x, 0. 
+LSEL, u, loc, x, w_cable  
+LSEL, u, loc, y, 0. 
+LSEL, u, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+! ==============================
+! contact 4: strand - strand 
+! ==============================
+! === 4-1: strand top - bottom 
+*do,isx,1,ns_x 			! 5 
+    *do, isy, 1, ns_y   ! 2
+		ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+		alls,below,area
+		SELTOL, 1e-6                     ! added on 24/03/2023
+		LSEL, r, loc, y, t0, t0          ! top-bot 
+		NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+		ESLN, r, 0 
+		*IF, isy, EQ, 1, THEN       ! BOTTOM strands
+			type, 100+c_contact       ! Target169
+			ESURF, all
+		*ELSE				        ! TOP strands
+			type, c_contact 	    ! conta
+			ESURF, all
+		*ENDIF
+	*enddo 
+*enddo
+! === 4-2: strand left - right 
+*do,isx,1,ns_x 			! 5 
+    *do, isy, 1, ns_y   ! 2
+		*if, isx, NE, ns_x, THEN             ! choose strand RIGHT side except one to insulation  (isx=ns_x)
+			ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+			alls,below,area
+			SELTOL, 1e-6                     ! added on 24/03/2023
+			LSEL, r, loc, x, isx*t0, isx*t0
+			NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+			ESLN, r, 0 
+			type, 100+c_contact ! Target169
+			ESURF, all
+		*endif
+
+		*if, isx, NE, 1, THEN			     ! choose strand LEFT side except one at sym-x  (isx = 1)
+			ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+			alls,below,area
+			SELTOL, 1e-6                     ! added on 24/03/2023
+			LSEL, r, loc, x, (isx-1)*t0, (isx-1)*t0
+			NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+			ESLN, r, 0 
+			type, c_contact 	  ! Conta172
+			ESURF, all
+		*endif
+	*enddo 
+*enddo
+alls
+! ==============================
+! contact 5: Cu - Nb3Sn : shared 
+! ==============================
+! ------------------------------
+
+! ------------------------------------------------------------
+! ==============================
+! == step 7: BC at time = 1 ==
+! ==============================
+! D,nset_bot,UX, 0!, , , , , , , , ,
+D,nset_bot,UY, 0!, , , , , , , , ,
+
+CMSEL, s, nset_left
+alls,below,node
+DSYM, symm, x, 0           ! Specifies symmetry or antisymmetry degree-of-freedom constraints on nodes.
+
+TIME, 1.
+NSUB, 10.
+!DELTIM, 0.1   ! == NSUB, 10.  ! N_sub 
+CMSEL, s, nset_top, node 
+alls,below,node
+D,nset_top,UY,-0.010e-3, , , , , , , ,   !!! displacement controlled on nodes 
+!SF, nset_top, PRES, 50E6           !!! pressure controlled on nodes 
+alls
+
+! ==============================
+! ==== step 8: solve        ====
+! ==============================
+
+!!! ! ========================
+!!! ! === Solve time = 1 =====
+!!! ! ========================
+outres, ALL, ALL                    !!! output everything to results file 
+!FINISH  
+/SOL
+/STATUS,SOLU
+SOLVE
+
+!*GET, COUNT_element, ELEM,,COUNT
+!*GET, COUNT_node, node,,COUNT
+! ==============================
+! ==== step 9: Postprocess =====
+! ==============================
+/post1
+
+/AUTO,1  
+
+/PLOPTS,INFO,1
+/PLOPTS,LEG1,1  
+/PLOPTS,LEG2,0  
+/PLOPTS,LEG3,1  
+/PLOPTS,FRAME,0
+/PLOPTS,TITLE,1 
+/PLOPTS,MINM,1  
+/PLOPTS,FILE,0   
+/PLOPTS,WINS,1  
+/PLOPTS,WP,0
+/PLOPTS,DATE,0  
+/TRIAD,OFF  
+/REPLOT 
+/CONTOUR, 1, 10.
+
+!/CONTOUR, 1, 10., 0., ,2e-4
+
+!/POST1
+!/VIEW, 1,1,1,1
+!/REPLO 
+PLNSOL, U, Y, -0.1, 0.               ! DoF displacement in X on Nodes 
+
+set, 1, 5
+
+!!! displacement !!!
+/show,png  
+PLNSOL, U, X, 0, 1.0  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_UX,png,
+
+/show,png  
+PLNSOL, U, Y, 0, 1.0  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_UY,png,
+
+!!! strain !!!
+! total strain 
+/show,png  
+plnsol,epto, z
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_eptoz,png,
+
+/show,png  
+plnsol,epto, 1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_epto1,png,
+
+/show,png  
+plnsol,epto, eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_epto_eqv,png,
+
+! elastic strain 
+/show,png  
+!/CONTOUR, 1, 10., 0., ,.002
+PLNSOL, EPEL, eqv  
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPEL_EQV,png,
+
+/show,png  
+PLNSOL, EPEL, y
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPEL_Y,png,
+
+! plastic strain 
+/show,png  
+PLNSOL, EPPL, eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_eqv,png,
+
+/show,png  
+PLNSOL, EPPL, 1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_1,png,
+
+/show,png  
+PLNSOL, EPPL, z
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_EPPL_z,png,
+
+
+!!! stress !!! 
+/show,png  
+plnsol,s,y
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_sy,png,
+
+/show,png  
+plnsol,s,1
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_s1,png,
+
+/show,png 
+!/CONTOUR, 1, 10., 0., ,.3E8  
+plnsol,s,eqv
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_s_eqv,png,
+
+
+!!!!!!!!!!!!! CONTACT !!!!!!!!!!!!!!!!!!!
+!! Contact status: NearContact; Sliding 
+!! CONTSTAT
+
+!! Contact penetration: 
+!! CONTPENE 
+
+!! Contact pressure:
+!! CONTPRES 
+
+!! Contact friction stress: CONTSFRI
+
+!! Contact total stress: CONTSTOT
+
+!! Contact Sliding distance: CONTSLID
+
+!! Contact gap distance: CONTGAP
+
+!! Contact heat flux: CONTFLUX 
+
+!! Contact chattering: CONTCNOS 
+
+/show,png  
+plnsol,CONT,STAT
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSTAT_ContactStatus,png,
+
+! stress 
+/show,png  
+plnsol,CONT,PRES
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTPRES_ContactPressure,png,
+
+/show,png  
+plnsol,CONT,SFRI
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSFRI_ContactFrictionStress,png,
+
+/show,png  
+plnsol,CONT,STOT
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSTOT_ContactTotalStress,png,
+
+! sliding distance 
+/show,png  
+plnsol,CONT,SLID
+/show,close 
+/rename,March21_000,png,,etsize%mesh_size*1000%um_CONTSLID_ContactSlidingDistance,png,
+
+
+
+
+
+
+! from .log file 
+/SHOW,WIN32C
+SET,FIRST   
+/PLOPTS,INFO,3  
+/CONTOUR,ALL,18 
+/PNUM,MAT,1 
+/NUMBER,1   
+/REPLOT,RESIZE  
+PLNSOL,S,Y  
+
+
+! read nb of nset 
+cmsel,s,nset_top,node
+*GET, nb_top_layer, node, 0, count ! nb_top_layer = 733
+*VGET, NODELISTC, NODE, ALL, NLIST 
+! *VGET, ParR, Entity, ENTNUM, Item1, IT1NUM, Item2, IT2NUM, KLOOP
+! Retrieves values and stores them into an array parameter.
+
+*GET, nb_top_layer, node, 0, count ! nb_top_layer = 733
+*VGET, NODELISTC, NODE, ALL, NLIST 
+*GET, it_sy, NODE, NODELISTC(1), s, y
+*GET, it_pres, NODE, NODELISTC(1), pres
+
+*VGET, ELELISTC, NODE, ALL, ELIST 
+
+*DO, J, 1, nb_top_layer
+    *GET, it_seqv, NODE, NODELISTC(J), S, EQV
+*ENDDO
+
+!!!LIST
+PRRSOL,FY        !! Reaction Solu 
+
+cmsel,s,nset_top,node
+
+set,1,1
+PRNLD,FY, ,ALL   !! Nodal Loads
+
+!!!
+
+*cfopen,nset_top_seqv,out,,append
+*vwrite, ('    node_nb', '   sseqv')
+*DO, J, 1, nb_top_layer
+    *GET, it_seqv, NODE, NODELISTC(J), S, EQV
+	*vwrite,NODELISTC(J),it_seqv
+*ENDDO
+*cfclos,nset_top_seqv,out
+
+*cfopen,nset_top_seqv,out,,append
+*vwrite, ('node_nb', 'sseqv')
+*cfclos,nset_top_seqv,out
+
+
+!!PLESOL, F,Y, 0,1.0 ! plot reaction force in Y 
+
+
+!!! read each subset 
+_Sbstep1 = 5
+set, 1, _Sbstep1
+/title, Displacement UX at time= %_Sbstep1*0.1% s
+eplot
+PLNSOL, U, X, 0, 1.0               ! DoF displacement in X on Nodes 
+
+
+
+
+
+
+
+*DO, J, 1, 6
+    set,1,J
+	/show,png  
+	plnsol,U, y
+	/show,close 
+	/rename,March16_000,png,,Uy_%J%,png,
+*ENDDO
+
+
+
+set,1,2
+PLNSOL, U, X, 0, 1.0               ! DoF displacement in X on Nodes 

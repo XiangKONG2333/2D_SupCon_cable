@@ -1,0 +1,67 @@
+/NOPR   
+KEYW,PR_SET,1   
+KEYW,PR_STRUC,1 
+KEYW,PR_THERM,0 
+KEYW,PR_FLUID,0 
+KEYW,PR_ELMAG,0 
+KEYW,MAGNOD,0   
+KEYW,MAGEDG,0 
+KEYW,MAGHFE,0   
+KEYW,MAGELC,0   
+KEYW,PR_MULTI,0 
+/GO 
+!*  
+/COM,   
+/COM,Preferences for GUI filtering have been set to display:
+/COM,  Structural   
+!*  
+
+!
+cmsel,s,nset_top,node
+*GET, nb_top_layer, node, 0, count         ! count nb of nb_top_layer = 733
+*VGET, nset_top_index, NODE, ALL, NLIST    ! obtain every index in NSET and put them in LIST nset_top_index  
+
+
+/POST26                                    ! Postprocess: time - history 
+cmsel,s,n_top,node
+*VGET, n_top_index, NODE, ALL, NLIST   
+NSOL,2,n_top_index,U,Y, UY_top             ! read reaction force Fy into Arbitrary ref num (from 2 to NV)
+
+step_nb = 20
+
+*DIM,_A,TABLE,step_nb,aaa+1
+VGET,_A(1,0),1  ! time 
+VGET,_A(1,1),2  ! Uy 
+!VGET,_A(1,2),3  ! Fy 
+
+*dim,Fy_total,array,step_nb,1
+
+! loop to read all node NSET_TOP
+*DO, J, 1, nb_top_layer
+	RFORCE,3,nset_top_index(J),F,y,FY_temp
+	VGET,Fy_temp,3  ! Fy
+	*DO, ist, 1, step_nb
+		Fy_total(ist) = Fy_total(ist) + FY_temp(ist)
+	*ENDDO
+*ENDDO
+!*SET,_A(1,2),Fy_total 
+!VGET,_A(1,2),3  ! Fy
+
+*DO, ist, 1, step_nb
+	*SET,_A(ist,2),Fy_total(ist) 
+*ENDDO
+
+!/DELETE,'../results_2023_#7/try',txt
+*cfopen,'../results_2023_#7/try1',txt,,!append
+
+*vwrite,
+('time (s)	', 'displacement UY (m)	','Force FY (N)')
+
+*vwrite,0,0,0
+%G, %G, %G
+
+*VWRITE,_A(1,0),_A(1,1),_A(1,2)
+%G, %G, %G
+*cfclos,try,txt
+
+

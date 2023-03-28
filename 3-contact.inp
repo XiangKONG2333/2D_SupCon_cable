@@ -1,0 +1,233 @@
+! strand set  
+! created on 24/03/2023
+! Contacts 
+
+! ==========================
+! ==== step 6: Contacts ====
+! ==========================
+! The target surface can be defined by 
+! - CONTA172 elements (for deformable surfaces; 2-D 3-Node Surface-to-Surface Contact) or  --> (for example, PLANE182, PLANE183, INTER193, SHELL208, SHELL209, PLANE223, CPT213, MATRIX50).
+! - TARGE169 elements (for rigid bodies only; 2-D Target Segment) or 
+! - CONTA174 elements (for 3-D 8-Node Surface-to-Surface Contact)
+! - CONTA175 elements (2-D/3-D Node-to-Surface Contact)
+! Real constant ans key option for the contact elements
+! keyopt(12)=0 standard (separation - sliding)
+! keyopt(12)=1 rough (separation - no sliding)
+! keyopt(12)=2 no separation (sliding)
+! keyopt(12)=5 bonded (no separation - no sliding)
+! keyopt(9)=1 Exclude both initial penetration or gap
+! keyopt(9)=0 Include both initial penetration or gap
+! keyopt(9)=3 Include offset only (contact real constant, positive being interf), exclude both initial penetration or gap
+
+! Define contact element type: - CONTA172 & TARGE169
+!c_index = 10 
+!ET,c_index,CONTA172 ! element type 
+!KEYOPT,c_index,12,5
+!!KEYOPT,c_index,12,0 ! standard (separation - sliding) 
+!KEYOPT,c_index,9,1  
+!MP,mu,c_index,0.2
+!r,c_index
+!R,c_index,,,, ,, 
+!RMORE,,,,-0, ,
+!ET,(100+c_index),targe169
+
+ET,120,CONTA172 ! element type 
+KEYOPT,120,12,0 ! standard (separation - sliding) 
+KEYOPT,120,9,1  
+MP,mu,120,0.2
+r,120
+R,120,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+120),targe169
+
+ET,121,CONTA172 ! element type 
+KEYOPT,121,12,1 ! rough (separation - no sliding)
+KEYOPT,121,9,1  
+MP,mu,121,0.2
+r,121
+R,121,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+121),targe169
+
+ET,122,CONTA172 ! element type 
+KEYOPT,122,12,2 ! no separation (sliding)
+KEYOPT,122,9,1  
+MP,mu,122,0.2
+r,122
+R,122,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+122),targe169
+
+ET,125,CONTA172 ! element type 
+KEYOPT,125,12,5 ! bonded (no separation - no sliding)
+KEYOPT,125,9,1  
+MP,mu,125,0.2
+r,125
+R,125,,,, ,, 
+RMORE,,,,-0, ,
+ET,(100+125),targe169
+
+
+! ==============================
+! contact 1: strand - insulation 
+! ==============================
+!!!!!!!!!!!! Contact type !!!!!!!!!!!!!!!!!!!!!!
+c_contact = 125
+! === 1A insulation as TARGET ===
+CMSEL, s, area_insu!, node 
+alls, below, area
+LSEL, r, loc, y, 0., t_cable 
+LSEL, r, loc, x, 0., w_cable
+NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+type,(100+c_contact)            ! TARGE169
+ESURF,all					  ! Generates elements overlaid on the free faces of selected nodes.
+! === 1B strands as CONTA ===
+! nset_cu_right 
+CMSEL, s, area_cu  
+alls,below,area
+LSEL, r, loc, x, w_cable     
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! nset_cu_bot
+CMSEL, s, area_cu            
+alls,below,area 
+LSEL, r, loc, y, 0.
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! nset_cu_top
+CMSEL, s, area_cu 
+alls,below,area 
+LSEL, r, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+! ==============================
+! contact 2: epoxy - insulation 
+! ==============================
+! === 2A insulation as TARGET : already defined in contact 1
+!CMSEL, s, area_insu!, node 
+!alls, below, area
+!LSEL, r, loc, y, 0., t_cable 
+!LSEL, r, loc, x, 0., w_cable
+!NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+!ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+!type,(100+c_contact)            ! TARGE169
+!ESURF,all					  ! Generates elements overlaid on the free faces of selected nodes.
+! === 2B strand as CONTACT
+!! nset_epoxy_right
+CMSEL, s, area_epoxy 
+alls,below,area
+SELTOL, 1.E-6                 ! changed on 24/03/2023 from e-3 to e-6
+LSEL, r, loc, x, w_cable       
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+!! nset_epoxy_bottom 
+CMSEL, s, area_epoxy 
+alls,below,area 
+!NSEL, r, loc, y, 0.
+LSEL, r, loc, y, 0. 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+!! nset_epoxy_top
+CMSEL, s, area_epoxy, node 
+alls,below,area  
+LSEL, r, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+! ==============================
+! contact 3: strand - epoxy 
+! ==============================
+! === 3A strand as TARGE
+CMSEL, s, area_cu, area
+alls,below,area 
+SELTOL, 1.E-9                 ! changed on 24/03/2023 from e-3 to e-6
+LSEL, r, loc, y, 0.1e-3, e0/4
+LSEL, a, loc, y, t0-e0/4, t0-0.1e-3
+LSEL, a, loc, y, t0+0.1e-3, t0+e0/4
+LSEL, a, loc, y, 2*t0-e0/4, 2*t0-0.1e-3
+LSEL, r, loc, x, 0.01e-3, w_cable-0.01e-3
+LPLOT
+NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+ESLN, r, 0                       ! Selects those elements attached to the selected nodes.
+type,(100+c_contact)             ! TARGE169
+ESURF,all					     ! Generates elements overlaid on the free faces of selected nodes.
+! === 3B epoxy as CONTA
+!! nset_epoxy_right
+CMSEL, s, area_epoxy 
+alls,below,area
+SELTOL, 1e-6                     ! added on 24/03/2023
+LSEL, u, loc, x, 0. 
+LSEL, u, loc, x, w_cable  
+LSEL, u, loc, y, 0. 
+LSEL, u, loc, y, t_cable 
+NSLL, s, 1
+ESLN, r, 0
+type, c_contact 
+ESURF, all 
+
+! ==============================
+! contact 4: strand - strand 
+! ==============================
+! === 4-1: strand top - bottom 
+*do,isx,1,ns_x 			! 5 
+    *do, isy, 1, ns_y   ! 2
+		ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+		alls,below,area
+		SELTOL, 1e-6                     ! added on 24/03/2023
+		LSEL, r, loc, y, t0, t0          ! top-bot 
+		NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+		ESLN, r, 0 
+		*IF, isy, EQ, 1, THEN       ! BOTTOM strands
+			type, 100+c_contact       ! Target169
+			ESURF, all
+		*ELSE				        ! TOP strands
+			type, c_contact 	    ! conta
+			ESURF, all
+		*ENDIF
+	*enddo 
+*enddo
+! === 4-2: strand left - right 
+*do,isx,1,ns_x 			! 5 
+    *do, isy, 1, ns_y   ! 2
+		*if, isx, NE, ns_x, THEN             ! choose strand RIGHT side except one to insulation  (isx=ns_x)
+			ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+			alls,below,area
+			SELTOL, 1e-6                     ! added on 24/03/2023
+			LSEL, r, loc, x, isx*t0, isx*t0
+			NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+			ESLN, r, 0 
+			type, 100+c_contact ! Target169
+			ESURF, all
+		*endif
+
+		*if, isx, NE, 1, THEN			     ! choose strand LEFT side except one at sym-x  (isx = 1)
+			ASEL, S, AREA,,400+ns_y*(isx-1)+ isy - 1
+			alls,below,area
+			SELTOL, 1e-6                     ! added on 24/03/2023
+			LSEL, r, loc, x, (isx-1)*t0, (isx-1)*t0
+			NSLL, s, 1                       ! Selects those nodes associated with the selected lines.
+			ESLN, r, 0 
+			type, c_contact 	  ! Conta172
+			ESURF, all
+		*endif
+	*enddo 
+*enddo
+alls
+! ==============================
+! contact 5: Cu - Nb3Sn : shared 
+! ==============================
+! ------------------------------

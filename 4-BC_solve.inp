@@ -1,0 +1,35 @@
+! strand set  
+! created on 24/03/2023
+
+! ==============================
+! == step 7: BC at time = 1 ==
+! ==============================
+! D,nset_bot,UX, 0!, , , , , , , , ,
+D,nset_bot,UY, 0!, , , , , , , , ,  
+
+CMSEL, s, nset_left
+alls,below,node
+DSYM, symm, x, 0           ! Specifies symmetry or antisymmetry degree-of-freedom constraints on nodes.
+
+TIME, 10.
+!NSUB, 10.
+DELTIM, 0.5   ! == NSUB, 10.  ! N_sub 
+AUTOTS, OFF   !Specifies whether to use automatic time stepping or load stepping.
+CMSEL, s, nset_top, node 
+alls,below,node
+D,nset_top,UY,-10e-6, , , , , , , ,   !!! displacement controlled on nodes 
+!SF, nset_top, PRES, 50E6           !!! pressure controlled on nodes 
+alls
+
+! ==============================
+! ==== step 8: solve        ====
+! ==============================
+
+!!! ! ========================
+!!! ! === Solve time = 1 =====
+!!! ! ========================
+outres, ALL, ALL                    !!! output everything to results file 
+!FINISH  
+/SOL
+/STATUS,SOLU
+SOLVE

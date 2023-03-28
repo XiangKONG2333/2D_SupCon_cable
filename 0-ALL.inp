@@ -1,0 +1,23 @@
+! generic SM-CC Ansys model
+
+!!!!!!!!!!!!!!!
+! intro
+!!!!!!!!!!!!111
+FINISH  
+/CLEAR,START
+
+
+!/title,MEC_2D_A
+!/filname,MEC_2D_A,0
+
+/prep7
+/UNITS,SI
+
+/input,../2D_octagone/1-geo_2D_octago,inp
+!*set,mesh_size,1.0e-3
+!*set,tol_contact,1.0e-5
+/input,../2D_octagone/2-mat_mesh,inp
+/input,../2D_octagone/3-contact,inp
+/input,../2D_octagone/4-BC_solve,inp
+
+! !Post-processing
