@@ -1,0 +1,87 @@
+/NOPR   
+KEYW,PR_SET,1   
+KEYW,PR_STRUC,1 
+KEYW,PR_THERM,0 
+KEYW,PR_FLUID,0 
+KEYW,PR_ELMAG,0 
+KEYW,MAGNOD,0   
+KEYW,MAGEDG,0 
+KEYW,MAGHFE,0   
+KEYW,MAGELC,0   
+KEYW,PR_MULTI,0 
+/GO 
+!*  
+/COM,   
+/COM,Preferences for GUI filtering have been set to display:
+/COM,  Structural   
+!*  
+
+!
+/POST26                                    ! Postprocess: time - history:
+
+! time, Ux, Uy, Uz, Fx, Fy, Fz, [exx, eyy, ezz, exy, eyz, exz], [sxx,syy,szz,sxy,syz,sxz], etoeqv, seqv
+step_nb = 20
+*DIM,_A,TABLE,step_nb,18
+
+cmsel,s,n_xyz,node       
+*VGET, n_xyz_index, NODE, ALL, NLIST  
+NSOL,2,n_xyz_index(1),U,X, UX_disp    
+NSOL,3,n_xyz_index(1),U,Y, UY_disp    
+NSOL,4,n_xyz_index(1),U,Z, UZ_disp    
+
+cmsel,s,nset_x1,node
+*GET, nb_nset_x1, node, 0, count        
+*VGET, nset_x1_index, NODE, ALL, NLIST  
+cmsel,s,nset_y1,node
+*GET, nb_nset_y1, node, 0, count         
+*VGET, nset_y1_index, NODE, ALL, NLIST      
+cmsel,s,nset_z1,node
+*GET, nb_nset_z1, node, 0, count         
+*VGET, nset_z1_index, NODE, ALL, NLIST      
+
+VGET,_A(1,0),1  ! time 
+VGET,_A(1,1),2  ! Ux 
+VGET,_A(1,2),3  ! Uy
+VGET,_A(1,3),4  ! Uz
+
+*dim,Fx_total,array,step_nb,1                          !
+*dim,Fy_total,array,step_nb,1                          !
+*dim,Fz_total,array,step_nb,1                          !
+! loop to read Force on node-set at each surface (x=1, y=1, z=1)
+*DO, J, 1, nb_nset_x1
+	RFORCE,5,nset_x1_index(J),F,x,             	   ! read Fx of each node at all time-steps
+	RFORCE,6,nset_y1_index(J),F,y,             	   ! read Fy of each node at all time-steps
+	RFORCE,7,nset_z1_index(J),F,z,             	   ! read Fz of each node at all time-steps
+	VGET,Fx_temp,5  								   ! put into Fy_temp 
+	VGET,Fy_temp,6  								   ! put into Fy_temp 
+	VGET,Fz_temp,7  								   ! put into Fy_temp 	
+	*DO, ist, 1, step_nb
+		Fx_total(ist) = Fx_total(ist) + Fx_temp(ist)   ! add Fx together at all time-steps
+		Fy_total(ist) = Fy_total(ist) + Fy_temp(ist)   ! add Fy together at all time-steps
+		Fz_total(ist) = Fz_total(ist) + Fz_temp(ist)   ! add Fz together at all time-steps
+	*ENDDO
+*ENDDO
+
+! put Force Array into table 
+*DO, ist, 1, step_nb
+	*SET,_A(ist,4),Fx_total(ist) 
+	*SET,_A(ist,5),Fy_total(ist)
+	*SET,_A(ist,6),Fz_total(ist)
+*ENDDO
+
+
+!! write file !!
+/DELETE,'SE_output',txt
+*cfopen,'SE_output',txt,,!append
+
+*vwrite,
+'time, Ux, Uy, Uz, Fx, Fy, Fz'
+
+*vwrite,
+0,0,0,0,0,0,0
+
+*VWRITE,_A(1,0),_A(1,1),_A(1,2),_A(1,3),_A(1,4),_A(1,5),_A(1,6)
+%G, %G, %G, %G, %G, %G, %G
+*cfclos,'SE_output',txt
+
+

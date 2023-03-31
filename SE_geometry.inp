@@ -1,0 +1,94 @@
+
+/FINISH
+/CLEAR
+/PREP7
+
+! geometery 1x1x1
+_l = 1
+_w = 1
+_h = 1
+
+!!! BLOCK, X1, X2, Y1, Y2, Z1, Z2
+BLOCK,,_l,,_w,,_h
+ET, 1, SOLID186           !!! SOLID185: 8-node c3d8, SOLID186: 20-node c3d20
+
+ESIZE, 1.0
+MESHKEY, 1         !!! mapped mesh
+VMESH, all
+
+! ==============================
+! ==== Material property  ======
+! ==============================
+mp, ex, 1, 10e6   !10 MPa
+mp, nuxy, 1, 0.3
+
+
+! ==============================
+! ==== boundary conditions =====
+! ==============================
+
+!!! node set 
+NSEL, s, loc, z, 0.
+CM, nset_z0, node
+
+NSEL, s, loc, z, _h
+CM, nset_z1, node
+
+NSEL, s, loc, x, 0.
+CM, nset_x0, node
+
+NSEL, s, loc, x, _l
+CM, nset_x1, node
+
+NSEL, s, loc, y, 0.
+CM, nset_y0, node
+
+NSEL, s, loc, y, _w
+CM, nset_y1, node
+
+NSEL, s, loc, y, _w
+NSEL, r, loc, x, _l
+NSEL, r, loc, x, _l
+CM, n_xyz, node
+
+
+!!! BC & Load
+csys,0
+alls
+CMSEL, s, nset_x0, node 
+!DSYM, symm, x, 0
+D,nset_x0,UX,0, , , , , , , , ,
+
+CMSEL, s, nset_y0, node 
+!DSYM, symm, y, 0x
+D,nset_y0,UY,0, , , , , , , , ,
+
+CMSEL, s, nset_z0, node 
+!DSYM, symm, z, 0
+D,nset_z0,UZ,0, , , , , , , , ,
+
+
+
+!!!
+
+
+TIME, 1.
+DELTIM, 0.1   
+CMSEL, s, nset_x1, node 
+D,nset_x1,UX,0.1, , , , , , , ,   !!! displacement controlled on nodes 
+!SF, nset_x1, PRES, 1000           !!! pressure controlled on nodes 
+
+!!! Solve 
+outres, ALL, ALL                    !!! output everything to results file 
+!FINISH  
+/SOL
+/STATUS,SOLU
+SOLVE   
+!FINISH  
+
+TIME, 2.
+NSUB, 10.  ! N_sub                   !!! t = 1.1 : 0.1 : 2.0 for n = 1::10
+D,nset_x1,UX,0., , , , , , , , 
+!SF, nset_x1, PRES, 2000
+SOLVE
+FINISH
